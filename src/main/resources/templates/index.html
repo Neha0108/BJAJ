@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>BFHL - Input Form</title>
+    <script>
+        function filterResponse() {
+            let selectedFilter = document.getElementById("filter").value;
+            let allData = JSON.parse(document.getElementById("fullResponse").textContent);
+            document.getElementById("output").textContent = JSON.stringify(allData[selectedFilter] || []);
+        }
+    </script>
+</head>
+<body>
+    <h2>BFHL Input Form</h2>
+    <form action="/process" method="post">
+        <label>Enter JSON:</label>
+        <input type="text" name="jsonInput" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div th:if="${response}">
+        <h3>Response:</h3>
+        <pre id="fullResponse" th:text="${response}"></pre>
+
+        <label>Filter Data:</label>
+        <select id="filter" onchange="filterResponse()">
+            <option value="alphabets">Alphabets</option>
+            <option value="numbers">Numbers</option>
+            <option value="highest_alphabet">Highest Alphabet</option>
+        </select>
+
+        <h4>Filtered Output:</h4>
+        <pre id="output"></pre>
+    </div>
+</body>
+</html>
