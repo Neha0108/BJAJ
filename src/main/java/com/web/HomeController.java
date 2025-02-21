@@ -2,11 +2,10 @@ package com.web;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import java.util.*;
 
 @RestController
-@RequestMapping("/bfhl")
+@RequestMapping("/bfhl")  // This maps all endpoints under "/bfhl"
 public class HomeController {
 
     @GetMapping
@@ -18,37 +17,30 @@ public class HomeController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> processInput(@RequestBody Map<String, List<String>> requestBody) {
-        // Validate request body
-        if (requestBody == null || !requestBody.containsKey("data")) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Invalid input format"));
-        }
-
         List<String> data = requestBody.get("data");
 
-        // Check if data is empty
         if (data == null || data.isEmpty()) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("is_success", false));
         }
 
         List<String> numbers = new ArrayList<>();
         List<String> alphabets = new ArrayList<>();
+        String highestAlphabet = "";
 
-        // Process input
         for (String item : data) {
             if (item.matches("\\d+")) {
                 numbers.add(item);
             } else if (item.matches("[a-zA-Z]")) {
                 alphabets.add(item);
+                if (highestAlphabet.isEmpty() || item.compareToIgnoreCase(highestAlphabet) > 0) {
+                    highestAlphabet = item;
+                }
             }
         }
 
-        // Determine highest alphabet (case insensitive)
-        String highestAlphabet = alphabets.isEmpty() ? "" : Collections.max(alphabets, String.CASE_INSENSITIVE_ORDER);
-
-        // Construct response
         Map<String, Object> response = new HashMap<>();
         response.put("is_success", true);
-        response.put("user_id", generateUserId("John Doe", "17091999"));  // Replace with dynamic values
+        response.put("user_id", "john_doe_17091999"); // Replace with dynamic values if needed
         response.put("email", "john@xyz.com");
         response.put("roll_number", "ABCD123");
         response.put("numbers", numbers);
@@ -58,8 +50,9 @@ public class HomeController {
         return ResponseEntity.ok(response);
     }
 
-    // Helper method to generate dynamic user_id
-    private String generateUserId(String fullName, String dob) {
-        return fullName.toLowerCase().replace(" ", "_") + "_" + dob;
+    // ✅ New Endpoint for Root ("/") to prevent 404 errors
+    @GetMapping("/")
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("Welcome to the Bajaj API! Use /bfhl for operations.");
     }
 }
